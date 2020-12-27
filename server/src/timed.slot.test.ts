@@ -1,5 +1,5 @@
 import { genKey } from './encryption';
-import { signTimeSlot, validateTimeSlot, isInsideTimeSlot } from './timed.slot';
+import { signTimeSlot, isTimeslotProofValid, isInsideTimeSlot } from './timed.slot';
 describe("time slot test",()=> {
     const key=genKey();
 
@@ -11,16 +11,16 @@ describe("time slot test",()=> {
     test("simple hmac",()=>{
         const proof = signTimeSlot(now,now1h, key);    
 
-        expect(validateTimeSlot(now,now1h,key, proof)).toBe(true)
+        expect(isTimeslotProofValid(now,now1h,key, proof)).toBe(true)
         expect(isInsideTimeSlot(now,now1h,key, proof)).toBe(true)
         
-        expect(validateTimeSlot(now+1,now1h,key, proof)).toBe(false)
+        expect(isTimeslotProofValid(now+1,now1h,key, proof)).toBe(false)
     })
 
     test("invalid time slot",()=>{
         const proof = signTimeSlot(beforeNow,now-1, key);
 
-        expect(validateTimeSlot(beforeNow,now-1,key, proof)).toBe(true)
+        expect(isTimeslotProofValid(beforeNow,now-1,key, proof)).toBe(true)
         expect(isInsideTimeSlot(beforeNow,now-1,key, proof)).toBe(false)
     })
 })

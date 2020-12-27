@@ -1,4 +1,4 @@
-import { encrypt, decrypt, genKey } from './encryption';
+import { encrypt, decrypt, genKey, getKeyID } from './encryption';
 
 describe("test encryption",()=>{
     const data = "Hello";
@@ -24,5 +24,11 @@ describe("test encryption",()=>{
         console.log(`[KEY] ${key}`)
         expect(key.length).toBeGreaterThan(16);
         expect(key.length).toBe(keyLength);
+    })
+
+    test ("keyid",()=>{
+        const key ="0123";
+        expect(getKeyID(key)).
+            toBe("38df2cb74704cb23e8794e46e8dc26065b9d30d789a39b5d9868dfdb2d7c647a");
     })
 })

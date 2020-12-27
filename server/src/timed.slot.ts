@@ -6,12 +6,12 @@ export const signTimeSlot=(start: number, end:number, key:string):string =>
     return encryptor.hmac(start +";" + end);
 }
 
-export const validateTimeSlot=(start: number, end:number, key:string, hmac: string)=> {
+export const isTimeslotProofValid=(start: number, end:number, key:string, hmac: string)=> {
     return hmac === signTimeSlot(start,end,key);
 }
 
 export const isInsideTimeSlot=(start: number, end:number, key:string, hmac: string)=> {
-    if (validateTimeSlot(start,end,key,hmac)) {
+    if (isTimeslotProofValid(start,end,key,hmac)) {
         const now = Date.now();
         if (start <= now && now <= end ) {
             return true;
