@@ -1,0 +1,26 @@
+import { genKey } from './encryption';
+import { signTimeSlot, validateTimeSlot, isInsideTimeSlot } from './timed.slot';
+describe("time slot test",()=> {
+    const key=genKey();
+
+    const beforeNow = Date.now() - 1000;
+    const now = Date.now();
+    const now1h = now + 60*60*1000;
+    
+
+    test("simple hmac",()=>{
+        const proof = signTimeSlot(now,now1h, key);    
+
+        expect(validateTimeSlot(now,now1h,key, proof)).toBe(true)
+        expect(isInsideTimeSlot(now,now1h,key, proof)).toBe(true)
+        
+        expect(validateTimeSlot(now+1,now1h,key, proof)).toBe(false)
+    })
+
+    test("invalid time slot",()=>{
+        const proof = signTimeSlot(beforeNow,now-1, key);
+
+        expect(validateTimeSlot(beforeNow,now-1,key, proof)).toBe(true)
+        expect(isInsideTimeSlot(beforeNow,now-1,key, proof)).toBe(false)
+    })
+})
