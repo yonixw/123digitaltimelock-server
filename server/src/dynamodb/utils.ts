@@ -1,5 +1,7 @@
 import { 
     DynamoDBClient, GetItemCommand, ListTablesCommand,
+    PutItemCommand,
+    PutItemInput,
     QueryCommand, QueryInput 
 } from '@aws-sdk/client-dynamodb'
 const {wrap,unwrap} = require('dynamodb-data-types').AttributeValue;
@@ -42,6 +44,27 @@ export  const ddbQueryRowsById = async (
         if (results.$metadata.httpStatusCode >= 400)
             return results;
         return results.Items.map(e=>unwrap(e));
+    } catch (err) {
+        return err;
+    }
+}
+
+
+export  const ddbCreateUpdateRow = async (
+    client: DynamoDBClient,
+    tableName:string, item: any) => {
+
+    const params : PutItemInput = {
+        Item: wrap(item),
+        TableName: tableName,
+
+    };
+
+    try {
+        const results = await client.send(new PutItemCommand(params));
+        if (results.$metadata.httpStatusCode >= 400)
+            return results;
+        return unwrap(results.Attributes);
     } catch (err) {
         return err;
     }
