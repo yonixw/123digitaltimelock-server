@@ -22,7 +22,7 @@ describe("test encryption",()=>{
         const keyLength = 16+Math.floor(Math.random()*16)
         const key = genKey(keyLength);
         console.log(`[KEY] ${key}`)
-        expect(key.length).toBeGreaterThan(16);
+        expect(key.length).toBeGreaterThan(15);
         expect(key.length).toBe(keyLength);
     })
 

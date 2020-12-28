@@ -1,38 +1,29 @@
-import { DynamoDBClient, GetItemCommand, ListTablesCommand, QueryCommand } from '@aws-sdk/client-dynamodb'
-import express from "express";
 
+import express from "express";
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { ddbQueryRowsById } from './dynamodb/utils';
 require("dotenv").config();
+
+const client = new DynamoDBClient({ region: "eu-central-1" });
+const DDB_TABLES = {
+    "USERS": "123digialtimelock_users",
+    "SLOTS": "123digialtimelock_timeslots",
+    "ENC_KEYS": "123digialtimelock_keys",
+    "ENC_DATA": "123digialtimelock_data"
+}
 
 const app = express()
 const port = 3000
-const client = new DynamoDBClient({ region: "eu-central-1" });
 
 
 app.get('/', (req, res) => {
     res.send('Hello World!')
 })
 
-app.get('/getusers', async (req, res) => {
-    // Set the parameters
-    const params = {
-        KeyConditionExpression: "id = :i",
-        //FilterExpression: "contains (Subtitle, :topic)",
-        ExpressionAttributeValues: {
-            ":i": { S: "yonixw" },
-        },
-        ExpressionAttributeNames: {
-            "#c": "token"
-        },
-        ProjectionExpression: "id,#c",
-        TableName: "123digialtimelock_users",
-    };
-
-    const results = await client.send(new QueryCommand(params));
-    try {
-        res.send(results);
-    } catch (err) {
-        res.send(err);
-    }
+app.get('/getuser/:id', async (req, res) => {
+    const results =
+         await ddbQueryRowsById(client,DDB_TABLES.USERS,req.params.id); 
+    res.send(results);
 })
 
 
