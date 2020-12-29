@@ -19,7 +19,6 @@ export function fastFail<T>(error:string|any) : ExpressResult<T> {
 
 
 export interface CreateKeyCommandInput {
-    user_id: string,
     key?: string
 }
 
