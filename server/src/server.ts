@@ -5,23 +5,23 @@ import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { ddbQueryRowsById, ddbCreateUpdateRow } from './dynamodb/utils';
 
 import { genKey, getKeyID } from "./crypto/encryption";
+import { fastFail } from './dynamodb/models';
+import { CreateKeyCommandInput, DDB_TABLES, 
+    EncKeyRow, ExpressResult, fastData } from './dynamodb/models';
+
+import {apiCreateKey} from './dynamodb/apis'
 
 require("dotenv").config();
-
 const client = new DynamoDBClient({ region: "eu-central-1" });
-const DDB_TABLES = {
-    "USERS": "123digialtimelock_users",
-    "SLOTS": "123digialtimelock_timeslots",
-    "ENC_KEYS": "123digialtimelock_keys",
-    "ENC_DATA": "123digialtimelock_data"
-}
 
 const app = express()
 const port = 3000
+app.use(require("morgan")("dev"));
 app.use(express.json({limit:"5mb"}))
 
+
 app.get('/', (req, res) => {
-    res.send('Hello World!')
+    res.send(fastData('OK'))
 })
 
 app.get('/getuser/:id', async (req, res) => {
@@ -30,56 +30,37 @@ app.get('/getuser/:id', async (req, res) => {
     res.send(results);
 })
 
-interface CreateKeyCommand {
-    user_id: string,
-    key: string
-}
-interface EncKeyRow {
-    user_id: string;
-    key_id: string;
-    key: string;
-}
-
 app.post('/createkey',async (req,res)=> {
-    const body = req.body as CreateKeyCommand;
-    if (!body["key"] || !body["user_id"])
-        res.send("Error: missing data in post");
-    else {
-        const key_id = getKeyID(body.key);
-        const rowData : EncKeyRow = {
-            user_id: body.user_id,
-            key_id: key_id,
-            key: body.key
-        }
-        try {
-            const putResult = await ddbCreateUpdateRow(
-                client,DDB_TABLES.ENC_KEYS,rowData
-            );
-            res.send(putResult);
-        } catch (error) {
-            res.send(error);
-        }
-
-    }
+    const body = req.body as CreateKeyCommandInput;
+    const putResult = await apiCreateKey(client,body);
+    res.send(putResult);
 })
 
 app.get('/createkey_example1', async (req,res)=> {
-    const test_resp = await fetch(`http://localhost:${port}/createkey`,{
-        method:"POST",
-        headers: {
-            "content-type": "application/json"
-        },
-        body: JSON.stringify({
-            user_id:"yonixw",
-            key: genKey()
-        })
-    })
-    const  data = await test_resp.text();
+    const ep = "/createkey";
+    const payload = {
+        user_id:"yonixw",
+        //(optional) key: genKey()
+    };
+    const data = await postEndpoint(ep, payload);
     res.send(data);
 })
 
 app.listen(port, () => {
-    throw new Error("Implement storng class for ERROR or OK results, because now some are empty!!");
-    
-    console.log(`Example app listening at http://localhost:${port}`)
+    console.log(`❤ ❤ Example app listening at http://localhost:${port}`)
 })
+
+
+async function postEndpoint(
+    ep: string, payload: CreateKeyCommandInput) {
+    const test_resp = await fetch(`http://localhost:${port}${ep}`, {
+        method: "POST",
+        headers: {
+            "content-type": "application/json"
+        },
+        body: JSON.stringify(payload)
+    });
+    const data = await test_resp.text();
+    return data;
+}
+

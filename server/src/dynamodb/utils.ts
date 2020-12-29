@@ -1,3 +1,4 @@
+import { ExpressResult, fastData, fastFail } from './models';
 import { 
     DynamoDBClient, GetItemCommand, ListTablesCommand,
     PutItemCommand,
@@ -12,7 +13,7 @@ export  const ddbQueryRowsById = async (
     client: DynamoDBClient,
     tableName:string, id: string,
     idAttributeName:string="id",
-    projection:string[] = [], limit=1) => {
+    projection:string[] = [], limit=1) : Promise<ExpressResult<Array<any>>> => {
 
     const attrId : {[key: string]: string;} = {
         "#c0": idAttributeName
@@ -42,17 +43,17 @@ export  const ddbQueryRowsById = async (
     try {
         const results = await client.send(new QueryCommand(params));
         if (results.$metadata.httpStatusCode >= 400)
-            return results;
-        return results.Items.map(e=>unwrap(e));
+            return fastFail(results);
+        return fastData(results.Items.map(e=>unwrap(e)));
     } catch (err) {
-        return err;
+        return fastFail(err);
     }
 }
 
 
 export  const ddbCreateUpdateRow = async (
     client: DynamoDBClient,
-    tableName:string, item: any) => {
+    tableName:string, item: any): Promise<ExpressResult<void>> => {
 
     const params : PutItemInput = {
         Item: wrap(item),
@@ -63,10 +64,10 @@ export  const ddbCreateUpdateRow = async (
     try {
         const results = await client.send(new PutItemCommand(params));
         if (results.$metadata.httpStatusCode >= 400)
-            return results;
-        return unwrap(results.Attributes);
+            return fastFail(results);
+        return fastData(unwrap(results.Attributes));
     } catch (err) {
-        return err;
+        return fastFail(err);
     }
 }
 
