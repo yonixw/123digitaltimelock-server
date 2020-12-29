@@ -104,16 +104,15 @@ export async function apiCreateEncData(
             return fastFail(findKeyResult.error);
 
         if (
-            Array.isArray(findKeyResult.data) && findKeyResult.data.length > 1
+            Array.isArray(findKeyResult.data) && findKeyResult.data.length > 0
         ) {
             const resultRow = (findKeyResult.data as Array<EncKeyRow>)[0];
             if (resultRow.key_id != keyId) {
                 return fastFail(`Got key_id '${resultRow.key_id}' while sent '${keyId}'`)
             }
-            console.log(findKeyResult.data);
             key = resultRow.key;
         }
-        else {
+        else {            
             return fastFail("Can't find key_id under user")
         }
     }

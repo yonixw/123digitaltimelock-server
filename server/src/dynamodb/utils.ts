@@ -3,7 +3,7 @@ import {
     DynamoDBClient, GetItemCommand, ListTablesCommand,
     PutItemCommand,
     PutItemInput,
-    QueryCommand, QueryInput
+    QueryCommand, QueryInput, ScanCommand
 } from '@aws-sdk/client-dynamodb'
 import { Response } from 'express';
 const { wrap, unwrap } = require('dynamodb-data-types').AttributeValue;
