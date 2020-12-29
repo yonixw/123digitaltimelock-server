@@ -7,11 +7,11 @@ For all:
 (data_id, start, end, HMAC(start,end,data_id,key_id))
 
 Non locked APIs:
-*. Generate Secret=Enc.Key String and return it in full (key name,key_id = hash of key).
+[V] *. Generate Secret=Enc.Key String and return it in full (key name,key_id = hash of key).
 	(QR code will contain Secret+ Original data since Secret is enough to get data, see bellow)
 *. Delete key_id key_value but keep an ID (For users like me, no point to hold key in DB)
-*  List all keys
-	* Each key has list of data encrypted by it
+[V]*  List all keys
+[X]* List data of keys
 *. Get all timeslots and their proofs for data_id
 
 DB Keys (Non locked) or Post Keys:

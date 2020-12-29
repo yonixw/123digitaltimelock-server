@@ -13,6 +13,14 @@ export interface EncKeyRow {
     nickname: string;
 }
 
+export interface DataEncRow {
+    user_id: string;    // Partition Key
+    data_id: string;    // Range key
+    key_id: string;     
+    data_enc_val: string;
+    nickname: string;
+}
+
 
 // ========== EXPRESS RESULT
 
