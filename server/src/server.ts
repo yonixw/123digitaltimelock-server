@@ -6,10 +6,13 @@ import { ddbQueryRowsById, ddbCreateUpdateRow } from './dynamodb/utils';
 
 import { genKey, getKeyID } from "./crypto/encryption";
 import { fastFail } from './dynamodb/models';
-import { CreateKeyCommandInput, DDB_TABLES, 
-    EncKeyRow, ExpressResult, fastData } from './dynamodb/models';
+import {
+    CreateKeyCommandInput, DDB_TABLES,
+    EncKeyRow, ExpressResult, fastData
+} from './dynamodb/models';
 
-import {apiCreateKey} from './dynamodb/apis'
+import { apiCreateKey } from './dynamodb/apis'
+import { ddbBasicAuth } from "./dynamodb/utils";
 
 require("dotenv").config();
 const client = new DynamoDBClient({ region: "eu-central-1" });
@@ -17,8 +20,8 @@ const client = new DynamoDBClient({ region: "eu-central-1" });
 const app = express()
 const port = 3000
 app.use(require("morgan")("dev"));
-app.use(express.json({limit:"5mb"}))
-
+app.use(ddbBasicAuth(client));
+app.use(express.json({ limit: "5mb" }))
 
 app.get('/', (req, res) => {
     res.send(fastData('OK'))
@@ -26,20 +29,20 @@ app.get('/', (req, res) => {
 
 app.get('/getuser/:id', async (req, res) => {
     const results =
-         await ddbQueryRowsById(client,DDB_TABLES.USERS,req.params.id); 
+        await ddbQueryRowsById(client, DDB_TABLES.USERS, req.params.id);
     res.send(results);
 })
 
-app.post('/createkey',async (req,res)=> {
+app.post('/createkey', async (req, res) => {
     const body = req.body as CreateKeyCommandInput;
-    const putResult = await apiCreateKey(client,body);
+    const putResult = await apiCreateKey(client, body);
     res.send(putResult);
 })
 
-app.get('/createkey_example1', async (req,res)=> {
+app.get('/createkey_example1', async (req, res) => {
     const ep = "/createkey";
     const payload = {
-        user_id:"yonixw",
+        user_id: "yonixw",
         //(optional) key: genKey()
     };
     const data = await postEndpoint(ep, payload);

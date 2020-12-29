@@ -1,13 +1,15 @@
-import { ExpressResult, fastData, fastFail } from './models';
+import { DDB_TABLES, ExpressResult, fastData, fastFail } from './models';
 import { 
     DynamoDBClient, GetItemCommand, ListTablesCommand,
     PutItemCommand,
     PutItemInput,
     QueryCommand, QueryInput 
 } from '@aws-sdk/client-dynamodb'
+import { Response } from 'express';
 const {wrap,unwrap} = require('dynamodb-data-types').AttributeValue;
 
 //https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB.html#scan-property
+
 
 export  const ddbQueryRowsById = async (
     client: DynamoDBClient,
@@ -71,3 +73,27 @@ export  const ddbCreateUpdateRow = async (
     }
 }
 
+export function ddbBasicAuth(client) {
+    return async (req, res: Response<any>, next) => {
+        var authHeader = req.headers.authorization;
+        if (!authHeader) {
+            res.setHeader('WWW-Authenticate', 'Basic');
+            res.status(401).send('You are not authenticated!')
+        }
+
+        var auth = Buffer.from(authHeader.split(' ')[1], 'base64')
+            .toString().split(':');
+        var user = auth[0];
+        var pass = auth[1];
+
+        const userResult =
+            await ddbQueryRowsById(client, DDB_TABLES.USERS, user);
+        if (userResult.ok && Array.isArray(userResult.data) 
+            && userResult.data[0] && userResult.data[0].token == pass ) {
+            next(); // authorized
+        } else {
+            res.setHeader('WWW-Authenticate', 'Basic');
+            res.status(401).send('Wrong credenitals!')
+        }
+    }
+}
