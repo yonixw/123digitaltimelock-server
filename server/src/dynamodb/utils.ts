@@ -39,8 +39,9 @@ export const ddbQueryRowsById = async (
         ExpressionAttributeNames: attrId,
         ProjectionExpression: projectionString,
         TableName: tableName,
-        Limit: limit
     };
+    if (limit > -1)
+        params.Limit = limit;
 
     try {
         const results = await client.send(new QueryCommand(params));

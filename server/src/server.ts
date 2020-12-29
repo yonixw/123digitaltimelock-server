@@ -7,11 +7,12 @@ import { ddbQueryRowsById, ddbCreateUpdateRow } from './dynamodb/utils';
 import { genKey, getKeyID } from "./crypto/encryption";
 import { fastFail } from './dynamodb/models';
 import {
-    CreateKeyCommandInput, DDB_TABLES,
+    DDB_TABLES,
     EncKeyRow, ExpressResult, fastData
 } from './dynamodb/models';
 
-import { apiCreateKey } from './dynamodb/apis'
+import { apiCreateKey, apiListUserKeys, CreateKeyCommandInput } 
+    from './dynamodb/apis';
 import { ddbBasicAuth } from "./dynamodb/utils";
 
 require("dotenv").config();
@@ -37,20 +38,27 @@ app.post('/createkey', async (req, res) => {
 
 app.get('/createkey_example1', async (req, res) => {
     const ep = "/createkey";
-    const payload = {
+    const payload : CreateKeyCommandInput = {
+        nickname: "key_nick_" + Date.now()
         //(optional) key: genKey()
     };
-    const data = await postEndpoint(ep, payload,req);
+    const data = await postEndpoint<CreateKeyCommandInput>(ep, payload,req);
     res.send(data);
 })
 
+app.get('/listkeys', async (req, res) => {
+    const userId = req.headers.xuser as string;
+    const listResult = await apiListUserKeys(client, userId);
+    res.send(listResult);
+})
+
 app.listen(port, () => {
-    console.log(`❤ ❤ Example app listening at http://localhost:${port}`)
+    console.log(`❤ ❤ [APP] listening at http://localhost:${port}`)
 })
 
 
-async function postEndpoint(
-    ep: string, payload: CreateKeyCommandInput,
+async function postEndpoint<T>(
+    ep: string, payload: T,
         req: Request<any, any, any, any>) {
     const test_resp = await fetch(`http://localhost:${port}${ep}`, {
         method: "POST",
@@ -60,7 +68,7 @@ async function postEndpoint(
         },
         body: JSON.stringify(payload)
     });
-    const data = await test_resp.text();
+    const data = await test_resp.json();
     return data;
 }
 

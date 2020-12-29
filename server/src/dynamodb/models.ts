@@ -5,6 +5,17 @@ export const DDB_TABLES = {
     "ENC_DATA": "123digialtimelock_data"
 }
 
+
+export interface EncKeyRow {
+    user_id: string;    // Partition Key
+    key_id: string;     // Range key
+    key: string;
+    nickname: string;
+}
+
+
+// ========== EXPRESS RESULT
+
 export interface ExpressResult<T> {
     ok: boolean,
     error?: string | any,
@@ -17,36 +28,3 @@ export function fastFail<T>(error:string|any) : ExpressResult<T> {
         return {ok:false, error: error, data: ""}
 }
 
-
-export interface CreateKeyCommandInput {
-    key?: string
-}
-
-export interface CreateKeyCommandOutput {
-    key: string,
-    key_id: string,
-}
-
-export interface EncKeyRow {
-    user_id: string;    // Partition Key
-    key_id: string;     // Range key
-    key: string;
-}
-
-
-export interface CreateDataCommandInput {
-    data: string,
-    user_id: string,
-    key?: string,
-    key_id?: string,
-}
-
-export interface CreateDataCommandOutput {
-    data_id: string
-}
-
-export interface DataEncKeyRow {
-    user_id: string;    // Partition Key
-    key_id: string;     // Range key
-    enc_data: string;
-}
