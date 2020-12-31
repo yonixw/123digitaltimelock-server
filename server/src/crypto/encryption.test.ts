@@ -29,6 +29,6 @@ describe("test encryption",()=>{
     test ("keyid",()=>{
         const key ="0123";
         expect(getKeyID(key)).
-            toBe("38df2cb74704cb23e8794e46e8dc26065b9d30d789a39b5d9868dfdb2d7c647a");
+            toBe("38df2cb747");
     })
 })

@@ -18,7 +18,7 @@ export const genKey = (keyLength:number=32) : string => {
 
 export const getKeyID= (key:string) => {
     const enc = createEncryptor(padKey(key));
-    return enc.hmac("keyid");
+    return enc.hmac("keyid").substring(0,10);
 }
 
 export const encrypt = (plaintext:string, key:string) :string => {
