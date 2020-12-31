@@ -23,3 +23,6 @@ Key locked APIs:
 *. Add timeslot (start,end) and proofstring (calculate by HMAC key (**ONLY SENT=like login**)) 
 			for (key_id (hash of key), data_id)
     *. For each key, have "X time in advance" which will not be key locked to create time lock
+
+TODO:
+	- cut id's length in half

@@ -129,7 +129,7 @@ export async function apiCreateEncData(
     };
 
     const putResult = await ddbCreateUpdateRow(
-        client, DDB_TABLES.ENC_KEYS, rowData
+        client, DDB_TABLES.ENC_DATA, rowData
     );
 
     if (!putResult.ok)
