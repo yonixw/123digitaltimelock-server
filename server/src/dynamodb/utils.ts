@@ -53,12 +53,12 @@ export const ddbQueryRowsById = async (
     }
 }
 
-export const ddbQueryRowsBy2Id = async (
+export const ddbQueryRowsBy2Id = async <T>(
     client: DynamoDBClient,
     tableName: string,
     id1: string, id1AttributeName:string,
     id2: string, id2AttributeName:string,
-    projection: string[] = [], limit = 1): Promise<ExpressResult<Array<any>>> => {
+    projection: string[] = [], limit = 1): Promise<ExpressResult<Array<T>>> => {
 
     const attrId: { [key: string]: string; } = {
         "#c0": id1AttributeName,
@@ -92,7 +92,7 @@ export const ddbQueryRowsBy2Id = async (
         const results = await client.send(new QueryCommand(params));
         if (results.$metadata.httpStatusCode >= 400)
             return fastFail(results);
-        return fastData(results.Items.map(e => unwrap(e)));
+        return fastData<T[]>(results.Items.map(e => unwrap(e) as T));
     } catch (err) {
         return fastFail(err);
     }
