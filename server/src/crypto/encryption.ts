@@ -7,7 +7,7 @@ const padKey = (key:string): string => {
     return key;
 }
 
-const key_source="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()~`;'"
+const key_source="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()~;"
 export const genKey = (keyLength:number=32) : string => {
     let result = "";
     for (let i = 0; i < keyLength ; i++) {
