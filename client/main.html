@@ -47,6 +47,15 @@
                     Result
                 </pre>
             </li>
+            <li>
+                <h3>Decrypt time slot</h3> 
+                Use latest time slot + latest Encrypt data <br>
+                <button onclick="decryptTS()"> Decrypt </button> <br/>
+                <pre id="ts2_results" style="height: 200px; max-height: 200px;
+                 overflow-y: scroll; width: 400px; background-color: tan;">
+                    Result
+                </pre>
+            </li>
         </ul>
         <script>
             const server = "http://localhost:3000"
@@ -121,6 +130,15 @@
                 post('/gen_timeslot',{data:data,from:from,to:to})
                 .then(r=>
                     document.querySelector("#ts1_results").textContent = JSON.stringify(r,null,4)
+                )
+            }
+
+            function decryptTS() {
+                const encdata = JSON.parse(document.querySelector("#enc1_results").textContent);
+                const timeslot = JSON.parse(document.querySelector("#ts1_results").textContent);
+                post('/dec_timeslot',{encdata:encdata,timeslot:timeslot})
+                .then(r=>
+                    document.querySelector("#ts2_results").textContent = JSON.stringify(r,null,4)
                 )
             }
 

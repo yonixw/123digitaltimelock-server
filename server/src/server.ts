@@ -51,20 +51,15 @@ app.post('/verify_pass_id', (req,resp)=>{
 
 interface EncDataFile {
     encdata: string,
-    data_id: string,
-    data_salt: string,
     passId: PassId
 }
 
 function encryptData(data:string) : EncDataFile {
-    const data_salt = "DATA_HMAC_SALT";
-    const data_id = signHashSalt(data_salt, data, APP_PASS);
     const encdata = encrypt(data, APP_PASS);
     const passId: PassId = getPassID();
 
     return {
         encdata,
-        data_id, data_salt,
         passId
     }
 }
@@ -105,9 +100,7 @@ interface TimeSlot {
     from: number,
     to: number
     sign: string,
-    passId: PassId,
-    data_id: string,
-    data_salt: string
+    passId: PassId
 }
 
 function genTimeSlot(data:string, from:number, to:number) : TimeSlot{
@@ -120,7 +113,7 @@ function genTimeSlot(data:string, from:number, to:number) : TimeSlot{
     }
     else {
         try {
-            dataResult = signHashSalt(TIME_SIGN_SALT, data, APP_PASS);
+            dataResult = signHashSalt(TIME_SIGN_SALT, `${from}|${to}|${data}`, APP_PASS);
         } catch (error) {
             dataResult = error
         }
@@ -128,13 +121,45 @@ function genTimeSlot(data:string, from:number, to:number) : TimeSlot{
 
     return {
         from: from, to:to, sign: dataResult,
-        passId: getPassID(),
-        data_id: encdata.data_id, data_salt: encdata.data_salt
+        passId: getPassID()
     }
 }
 
 app.post('/gen_timeslot',(req,resp)=> {
     resp.send(genTimeSlot(req.body.data,req.body.from,req.body.to));
+})
+
+function decTimeSlot(timeslot: TimeSlot, dataFile: EncDataFile) : string{
+    let result = "init";
+    try {
+        if (signHashSalt(dataFile.passId.salt, PASS_SIGN_SALT , APP_PASS) 
+                !== dataFile.passId.pass_id) {
+            result = "Pass Id does not match"; // Not security!! just to avoid server mismatch
+        }
+        else {
+            const plainData = decrypt(dataFile.encdata,APP_PASS);
+            if (signHashSalt(TIME_SIGN_SALT,
+                 `${timeslot.from}|${timeslot.to}|${plainData}`, APP_PASS) != timeslot.sign) {
+                    result = "Timeslot sign mismatch";
+            }
+            else {
+                const nowtime = Date.now()
+                if (timeslot.from <= nowtime && timeslot.to >= nowtime ) {
+                    result = plainData;
+                }
+                else {
+                    result = "Not in time interval!";
+                }
+            }
+        }
+    } catch (error) {
+        result = `${error}`
+    }
+    return result;
+}
+
+app.post('/dec_timeslot',(req,resp)=>{
+    resp.send({result:decTimeSlot(req.body.timeslot,req.body.encdata)})
 })
 
 
