@@ -1,6 +1,6 @@
 * app has pass in ENV.
 APIs:
-	[ ] pass_id: () => {salt, hash(salt,pass)}
+	[V] pass_id: () => {salt, hash(salt,pass)}
 	[ ] locked_data: (data) => enc(pass,data), data_id=hash(salt,data), salt, pass_id
 		- `pass_id` to help us know if originated from here
 		- You keep!

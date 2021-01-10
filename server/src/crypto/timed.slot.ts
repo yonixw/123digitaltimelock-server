@@ -1,9 +1,10 @@
 import {createEncryptor} from 'simple-encryptor'
+import { signHash } from './encryption';
+
 
 export const signTimeSlot=(start: number, end:number, key:string):string =>
 {
-    const encryptor = createEncryptor(key);
-    return encryptor.hmac(start +";" + end);
+    return signHash(start +";" + end, key);
 }
 
 export const isTimeslotProofValid=(start: number, end:number, key:string, hmac: string)=> {

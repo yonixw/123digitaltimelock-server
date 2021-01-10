@@ -30,3 +30,17 @@ export const decrypt = (encryptdata:string, key:string) :string => {
     const dec = createEncryptor(padKey(key));
     return dec.decrypt(encryptdata);
 }
+
+export const signHash=(data:string,key:string):string =>
+{
+    const encryptor = createEncryptor(key);
+    return encryptor.hmac(data);
+}
+
+export const signHashSalt=(salt: string, data:string,key:string):string =>
+{
+    const encryptor = createEncryptor(key);
+    const result = encryptor.hmac(`${salt}${data}${salt}`);
+    //console.log([salt,data,key,result])
+    return result;
+}

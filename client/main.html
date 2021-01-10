@@ -1,0 +1,70 @@
+<html>
+    <head>
+        <title>
+            Timed lock
+        </title>
+    </head>
+    <body>
+        <ul style="list-style-type:none">
+            <li>
+                <h3>Get random salt pass_id</h3> 
+                <button onclick="getPassId()"> Get pass_id </button> <br/>
+                Hash: <span id="pass_id"></span> </br>
+                Hash salt: <span id="pass_id_salt"></span> <br />
+                <br />
+                <button onclick="validatePassID()"> Verify pass_id </button> <br/>
+                Valid?: <span id="pass_id_valid"></span> <br />
+            </li>
+            <li>
+                <h3>Get constant salt pass_id</h3> 
+                <button onclick="getPassIdConst()"> Get pass_id </button> <br/>
+                Hash: <span id="pass_id_const"></span> </br>
+                Hash salt: <span id="pass_id_salt_const"></span>
+            </li>
+        </ul>
+        <script>
+            const server = "http://localhost:3000"
+            const post = (ep,body)=>{
+                return new Promise((ok,bad)=> {
+                    fetch(`${server}${ep}`,{
+                        method: "POST",
+                        headers: {"content-type":"application/json"},
+                        body: JSON.stringify(body)
+                    })
+                    .then(r=>r.json())
+                    .then(r=>ok(r))
+                    .catch(e=>bad(e))
+                })
+            }
+
+            function getPassId(salt,id1,id2) {
+                post("/pass_id",{salt:salt})
+                .then(r=> {
+                        document.querySelector(id1 || "#pass_id").textContent = r.pass_id;
+                        document.querySelector(id2 ||"#pass_id_salt").textContent = r.salt
+                })
+                    
+            }
+
+            function validatePassID() {
+                const passId = document.querySelector("#pass_id").textContent
+                const pass_id_salt = document.querySelector("#pass_id_salt").textContent
+
+                post("/verify_pass_id",{salt:pass_id_salt, pass_id:passId})
+                .then(r=> {
+                        document.querySelector("#pass_id_valid").textContent = r.valid;
+                })
+            }
+
+            function getPassIdConst() {
+                getPassId("PASS_ID","#pass_id_const","#pass_id_salt_const");
+            }
+
+            let i=1;
+            Array.from(document.querySelectorAll("h3")).forEach(e=>{
+                e.textContent = `${i}. ${e.textContent}`;
+                i=i+1;
+            })
+        </script>
+    </body>
+</html>
