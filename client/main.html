@@ -21,6 +21,32 @@
                 Hash: <span id="pass_id_const"></span> </br>
                 Hash salt: <span id="pass_id_salt_const"></span>
             </li>
+            <li>
+                <h3>Encrypt data</h3> 
+                Plain data: <input id="data1" type="input" /> <br>
+                <button onclick="EncryptData1()"> Encrypt! </button> <br/>
+                <pre id="enc1_results" style="height: 200px; max-height: 200px;
+                 overflow-y: scroll; width: 400px; background-color: tan;">
+                    Result
+                </pre>
+            </li>
+            <li>
+                <h3>Unlock data with app Pass</h3> 
+                Pass: <input id="pass1" type="input" /> <br>
+                <button onclick="decryptData1()"> Decrypt! </button> <br/>
+                Plain text: <span id="plain_text_1"></span>
+            </li>
+            <li>
+                <h3>Make time slot</h3> 
+                Data: <input id="data_ts_1" type="input" /> <br>
+                From: <input id="ts_d_1" type="date" /> <input id="ts_t_1" type="time" /> <br>
+                To: <input id="ts_d_2" type="date" /> <input id="ts_t_2" type="time" /> <br>
+                <button onclick="makeTS()"> Generate </button> <br/>
+                <pre id="ts1_results" style="height: 200px; max-height: 200px;
+                 overflow-y: scroll; width: 400px; background-color: tan;">
+                    Result
+                </pre>
+            </li>
         </ul>
         <script>
             const server = "http://localhost:3000"
@@ -58,6 +84,44 @@
 
             function getPassIdConst() {
                 getPassId("PASS_ID","#pass_id_const","#pass_id_salt_const");
+            }
+
+            function EncryptData1() {
+                const data = document.querySelector("#data1").value;
+                post('/encdata',{data: data})
+                .then(r=>{
+                    document.querySelector("#enc1_results").textContent = JSON.stringify(r,null,4)
+                })
+            }
+
+            function decryptData1() {
+                const encdata = JSON.parse(document.querySelector("#enc1_results").textContent);
+                const pass= document.querySelector("#pass1").value;
+                post('/admin_unlock',{encdata:encdata,pass:pass})
+                .then(r=>{
+                    document.querySelector("#plain_text_1").textContent = r.result;
+                })
+            }
+
+            function getTime(id_date,id_time) {
+                const date=document.querySelector("#"+id_date).value //2021-01-30
+                    .split('-').map(e=>e-1+1); 
+                date[1] -= 1; // month start from 0;
+                const time=document.querySelector("#"+id_time).value //20:59
+                    .split(':').map(e=>e-1+1);  
+                const d = new Date(date[0],date[1],date[2],time[0],time[1]);
+                console.log(d)
+                return d.getTime();
+            }
+
+            function makeTS() {
+                const from=getTime("ts_d_1","ts_t_1");
+                const to=getTime("ts_d_2","ts_t_2");
+                const data = document.querySelector("#data_ts_1").value;
+                post('/gen_timeslot',{data:data,from:from,to:to})
+                .then(r=>
+                    document.querySelector("#ts1_results").textContent = JSON.stringify(r,null,4)
+                )
             }
 
             let i=1;

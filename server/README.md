@@ -1,15 +1,15 @@
 * app has pass in ENV.
 APIs:
 	[V] pass_id: () => {salt, hash(salt,pass)}
-	[ ] locked_data: (data) => enc(pass,data), data_id=hash(salt,data), salt, pass_id
+	[V] locked_data: (data) => enc(pass,data), data_id=hash(salt,data), salt, pass_id
 		- `pass_id` to help us know if originated from here
 		- You keep!
-	[ ] make_slot: (data, from, to) => hash(pass, from, to), pass_id
+	[ ] make_slot: (data, from, to) => hash(pass, from, to), pass_id, from,to
 		- `data` to prove you are owner of data
 		- `pass` to say it is relevant to this ENV
 		- You keep!
 	[ ] use_slot (locked_data, time slot) => plain_text
-	[ ] admin_unlock (pass, locked_data) => plain_text
+	[V] admin_unlock (pass, locked_data) => plain_text
 UIs:
 	plain data
 		- show as Image
