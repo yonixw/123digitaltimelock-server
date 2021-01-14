@@ -67,8 +67,19 @@
                         body: JSON.stringify(body)
                     })
                     .then(r=>r.json())
-                    .then(r=>ok(r))
-                    .catch(e=>bad(e))
+                    .then(r=>{
+                        if (r.ok) {
+                            ok(r.data);
+                        }
+                        else {
+                            console.error('[POST] Error:', r.error)
+                            bad(r.error);
+                        }
+                    })
+                    .catch(e=> {
+                        console.error('[POST] Error:', e)
+                        bad(e)
+                    })
                 })
             }
 
@@ -87,7 +98,7 @@
 
                 post("/verify_pass_id",{salt:pass_id_salt, pass_id:passId})
                 .then(r=> {
-                        document.querySelector("#pass_id_valid").textContent = r.valid;
+                        document.querySelector("#pass_id_valid").textContent = r;
                 })
             }
 
@@ -97,7 +108,7 @@
 
             function EncryptData1() {
                 const data = document.querySelector("#data1").value;
-                post('/encdata',{data: data})
+                post('/encdata',{plaintext: data})
                 .then(r=>{
                     document.querySelector("#enc1_results").textContent = JSON.stringify(r,null,4)
                 })
@@ -108,7 +119,7 @@
                 const pass= document.querySelector("#pass1").value;
                 post('/admin_unlock',{encdata:encdata,pass:pass})
                 .then(r=>{
-                    document.querySelector("#plain_text_1").textContent = r.result;
+                    document.querySelector("#plain_text_1").textContent = r;
                 })
             }
 
@@ -136,9 +147,9 @@
             function decryptTS() {
                 const encdata = JSON.parse(document.querySelector("#enc1_results").textContent);
                 const timeslot = JSON.parse(document.querySelector("#ts1_results").textContent);
-                post('/dec_timeslot',{encdata:encdata,timeslot:timeslot})
+                post('/dec_timeslot',{encdata:encdata,timeslotProof:timeslot})
                 .then(r=>
-                    document.querySelector("#ts2_results").textContent = JSON.stringify(r,null,4)
+                    document.querySelector("#ts2_results").textContent = r
                 )
             }
 

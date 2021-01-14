@@ -2,13 +2,13 @@ import {createEncryptor} from 'simple-encryptor'
 import { signHash } from './encryption';
 
 
-export const signTimeSlot=(start: number, end:number, key:string):string =>
+export const fastSignTimeSlot=(start: number, end:number, key:string):string =>
 {
     return signHash(start +";" + end, key);
 }
 
 export const isTimeslotProofValid=(start: number, end:number, key:string, hmac: string)=> {
-    return hmac === signTimeSlot(start,end,key);
+    return hmac === fastSignTimeSlot(start,end,key);
 }
 
 export const isInsideTimeSlot=(start: number, end:number, key:string, hmac: string)=> {
