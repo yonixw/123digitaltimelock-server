@@ -16,6 +16,7 @@ app.use(require('cors')({
     origin: '*',
     optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }))
+app.use("/static/",express.static("./static"))
 
 
 
@@ -73,9 +74,16 @@ RESTPost<IBYSlot,string>("/dec_iby_slot", app, async (body,h,u)=> {
     return decryptIBYSlot(body)
 })
 
+
+const serverlessExpress = require('@vendia/serverless-express')
+exports.handler = serverlessExpress({ app }).handler
+
+
 app.listen(port, () => {
     console.log(`❤ ❤ [APP] listening at http://localhost:${port}`)
 })
+
+
 
 
 
