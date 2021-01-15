@@ -19,6 +19,7 @@ app.use(require('cors')({
 
 
 
+
 // ===========
 
 
@@ -68,7 +69,7 @@ RESTPost<IBYSlotInput,IBYSlot>("/make_iby_slot", app, async (body,h,u)=> {
     return createIBYSlot(body.iby,body.from,body.to);
 })
 
-RESTPost<IBYSlot,string>("/make_iby_slot", app, async (body,h,u)=> {
+RESTPost<IBYSlot,string>("/dec_iby_slot", app, async (body,h,u)=> {
     return decryptIBYSlot(body)
 })
 
