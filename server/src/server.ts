@@ -3,9 +3,8 @@ import fetch from 'node-fetch'
 
 
 import { RESTPost } from './tsexpress/handlers';
-import { PassHashId, getAppPassHashID, PASS_SIGN_SALT, APP_PASS, EncryptState, encryptData, appPassDecrypt, SignedTimeslot, timeslotDecrypt, signTimeslot } from './api';
+import { PassHashId, getAppPassHashID, PASS_SIGN_SALT, APP_PASS, EncryptState, encryptData, appPassDecrypt, SignedTimeslot, timeslotDecrypt, signTimeslot, IBY, createIBY, IBYSlot, createIBYSlot, decryptIBYSlot } from './api';
 import { signHashSalt } from './crypto/encryption';
-import { fastSignTimeSlot } from './crypto/timed.slot';
 
 
 
@@ -57,7 +56,21 @@ RESTPost<DecryptTimeslotInput,string>("/dec_timeslot", app, async (body,h,u)=> {
     return timeslotDecrypt(body.timeslotProof,body.encdata)
 })
 
+// ===========
 
+interface IBYInput {plaintext:string}
+RESTPost<IBYInput,IBY>("/make_iby", app, async (body,h,u)=> {
+    return createIBY(body.plaintext);
+})
+
+interface IBYSlotInput {iby:IBY,from:number, to:number}
+RESTPost<IBYSlotInput,IBYSlot>("/make_iby_slot", app, async (body,h,u)=> {
+    return createIBYSlot(body.iby,body.from,body.to);
+})
+
+RESTPost<IBYSlot,string>("/make_iby_slot", app, async (body,h,u)=> {
+    return decryptIBYSlot(body)
+})
 
 app.listen(port, () => {
     console.log(`❤ ❤ [APP] listening at http://localhost:${port}`)

@@ -1,4 +1,4 @@
-import { encrypt, genKey, getKeyID, signHashSalt, decrypt } from './crypto/encryption';
+import { encrypt, genKey, getKeyID, signHashSalt, decrypt, signHash } from './crypto/encryption';
 
 require("dotenv").config();
 export const PASS_SIGN_SALT = "PASS_ID_HASH"
@@ -20,6 +20,21 @@ export interface EncryptState {
     encdata: string,
     passId: PassHashId
 }
+
+export interface IBY { 
+    encdata: EncryptState,
+    secretsign: string
+}
+
+export interface IBYSlot {
+    encdata: EncryptState,
+    publicsign: string,
+    from: number,
+    to:number
+}
+
+//============
+
 
 export function getAppPassHashID(salt?:string):PassHashId {
     let result: PassHashId = {
@@ -112,4 +127,47 @@ export function timeslotDecrypt(timeslot: SignedTimeslot, encrypted: EncryptStat
         result = `${error}`
     }
     return result;
+}
+
+export function createIBY(plaintext:string) : IBY {
+    const encdata = encryptData(plaintext);
+    return {
+        encdata: encdata,
+        secretsign: 
+            signHash(
+                `IBY_SALT_${plaintext}`,
+                APP_PASS
+            )
+    }
+}
+
+export function createIBYSlot(iby: IBY, from:number, to:number) : IBYSlot {
+    return {
+        encdata: iby.encdata,
+        // Doesnt need the secret of the server:
+        publicsign: signHash(`${from}|${to}`,iby.secretsign),
+        from: from,
+        to: to
+    }
+}
+
+export function decryptIBYSlot(slot: IBYSlot) : string {
+    const plaintext = appPassDecrypt(APP_PASS, slot.encdata);
+    if (
+        signHash(`${slot.from}|${slot.to}`, signHash(`IBY_SALT_${plaintext}`,APP_PASS))
+        ==
+        slot.publicsign
+    ){
+        const nowtime = Date.now()
+        if (slot.from <= nowtime && slot.to >= nowtime ) {
+            return plaintext;
+        }
+        else {
+            throw "Not in time interval!";
+        }
+        
+    }
+    else {
+        throw "Error in sign"
+    }
 }

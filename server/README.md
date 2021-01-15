@@ -11,9 +11,9 @@ APIs:
 	[V] use_slot (locked_data, time slot) => plain_text
 	[V] admin_unlock (pass, locked_data) => plain_text
 * IBY=I Believ You (per data), only in far places
-	[ ] data=> IBY = {encdata, hash(data_id,pass)}
-	[ ] IBY, from,to = IBY_slot with {enc_data, hash(IBY_hash,from,to)}
-	[ ] IBY_SLOT => data
+	[V] data=> IBY = {encdata, hash(data_id,pass)}
+	[V] IBY, from,to = IBY_slot with {enc_data, hash(IBY_hash,from,to)}
+	[V] IBY_SLOT => data
 UIs:
 	plain data
 		- show as Image

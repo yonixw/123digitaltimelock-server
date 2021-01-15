@@ -138,7 +138,7 @@
                 const from=getTime("ts_d_1","ts_t_1");
                 const to=getTime("ts_d_2","ts_t_2");
                 const data = document.querySelector("#data_ts_1").value;
-                post('/gen_timeslot',{data:data,from:from,to:to})
+                post('/gen_timeslot',{plaintext:data,from:from,to:to})
                 .then(r=>
                     document.querySelector("#ts1_results").textContent = JSON.stringify(r,null,4)
                 )
