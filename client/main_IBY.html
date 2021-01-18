@@ -75,7 +75,7 @@
                 const plaintext = $("#data1").value;
                 post("/make_iby",{plaintext: plaintext})
                     .then(r=>{
-                        $("#enc1_results").textContent = JSON.stringify(r,null,4)
+                        $("#enc1_results").value = JSON.stringify(r,null,4)
                     })
             }
 
@@ -83,7 +83,7 @@
                 const from=getTime("ts_d_1","ts_t_1");
                 const to=getTime("ts_d_2","ts_t_2");
                 post("/make_iby_slot",{
-                    iby: JSON.parse( $("#enc1_results").textContent), 
+                    iby: JSON.parse( $("#enc1_results").value), 
                     from: from, to:to
                 }).then((r)=>{
                     $("#ts1_results").value = JSON.stringify(r,null,4)
